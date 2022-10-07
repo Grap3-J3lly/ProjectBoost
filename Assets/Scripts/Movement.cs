@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour
 
     private KeyboardControls keyboardController;
     private Rigidbody rocketRigidbody;
+    private AudioSource audioSource;
 
     [SerializeField] float thrustAmount = 1000f;
     [SerializeField] float tiltAmount = .1f;
@@ -40,6 +41,7 @@ public class Movement : MonoBehaviour
     void Start()
     {
         rocketRigidbody = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
 
         thrusting = false;
         tiltingLeft = false;
@@ -77,7 +79,14 @@ public class Movement : MonoBehaviour
     void ProcessThrust() {
         if(thrusting) {
             rocketRigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * thrustAmount);
-        }        
+            if(!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+        }     
+        else {
+            audioSource.Stop();
+        }   
     }
 
     void ProcessRotation() {
