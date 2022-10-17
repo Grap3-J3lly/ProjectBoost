@@ -12,6 +12,11 @@ public class Movement : MonoBehaviour
 
     [SerializeField] float thrustAmount = 1000f;
     [SerializeField] float tiltAmount = .1f;
+    [SerializeField] AudioClip mainEngine;
+
+    [SerializeField] ParticleSystem mainJetParticles;
+    [SerializeField] ParticleSystem rightJetParticles;
+    [SerializeField] ParticleSystem leftJetParticles;
 
     bool thrusting;
     bool tiltingLeft;
@@ -78,24 +83,68 @@ public class Movement : MonoBehaviour
 
     void ProcessThrust() {
         if(thrusting) {
-            rocketRigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * thrustAmount);
-            if(!audioSource.isPlaying)
-            {
-                audioSource.Play();
-            }
+            StartThrust();
         }     
         else {
-            audioSource.Stop();
-        }   
+            StopThrust();
+        } 
+    }
+
+    void StartThrust()
+    {
+        rocketRigidbody.AddRelativeForce(Vector3.up * Time.deltaTime * thrustAmount);
+        if(!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(mainEngine);
+        }
+
+        if(!mainJetParticles.isPlaying)
+        {
+            mainJetParticles.Play();
+        }
+    }
+
+    void StopThrust()
+    {
+        audioSource.Stop();
+        mainJetParticles.Stop();
     }
 
     void ProcessRotation() {
         if(tiltingLeft) {
-            ApplyRotation(tiltAmount);
+            TiltingLeft();
         }
         else if(tiltingRight) {
-            ApplyRotation(-tiltAmount);
+            TiltingRight();
         }
+        else
+        {
+            StopTilting();
+        }
+    }
+
+    void TiltingLeft()
+    {
+        if(!rightJetParticles.isPlaying)
+        {
+            rightJetParticles.Play();
+        }
+        ApplyRotation(tiltAmount);
+    }
+
+    void TiltingRight()
+    {
+        if(!leftJetParticles.isPlaying)
+        {
+            leftJetParticles.Play();
+        }
+        ApplyRotation(-tiltAmount);
+    }
+
+    void StopTilting()
+    {
+        rightJetParticles.Stop();
+        leftJetParticles.Stop();
     }
 
     void ApplyRotation(float rotationThisFrame) {
